@@ -45,7 +45,7 @@ export function FirebaseProvider({ children }) {
       return false;
     }
     const q = doc(db, "typeids", id.toString());
-    const document = await getDoc(q);
+    let document = await getDoc(q);
     //console.log(document.data());
     return document.data().typeName;
   }
@@ -71,14 +71,18 @@ export function FirebaseProvider({ children }) {
     }
   }
 
-  async function setViewingBlueprintByID(id) {
+  async function setViewingBlueprintByID(id, quantity) {
     if (!id) {
       console.log("Invalid ID passed to function setCurrentItemByID(): ", id);
       return false;
     }
-    const blueprint = await getBlueprintForID(id) 
+    const blueprint = await getBlueprintForID(id);
     if (blueprint) {
-      setViewingBlueprint(blueprint)
+      setViewingBlueprint({
+        ...blueprint,
+        multiplier: quantity / blueprint.products.quantity,
+      });
+      console.log(viewingBlueprint);
     }
   }
 
@@ -128,10 +132,13 @@ export function FirebaseProvider({ children }) {
         name: itemName,
         expandableIDs: expandableIDs,
         blueprint: bp,
+        typeid: bp.products.typeid,
+        quantity: 1,
       };
       //console.log("Material Tree: ");
       //console.dir(tree, { depth: null });
       setTreeStructure(tree);
+      setViewingBlueprint({ ...bp, quantity: 1, typeid: bp.products.typeid });
     }
   }
 
@@ -210,7 +217,6 @@ export function FirebaseProvider({ children }) {
     generateTreeForID,
     treeStructure,
     viewingBlueprint,
-    setViewingBlueprint,
     setViewingBlueprintByID,
     getPrice,
   };

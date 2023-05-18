@@ -16,47 +16,49 @@ function BlueprintCard(props) {
   const [blueprint, setBlueprint] = useState();
   const [item, setItem] = useState();
   useEffect(() => {
-    async function getBP() {
-      let bp = await fb.getBlueprintForID(props.itemID);
-      //console.log(bp);
-      setBlueprint(bp);
-    }
-    if (!blueprint) {
-      getBP();
-    } else if (blueprint.products.itemid !== props.itemID) {
-      getBP();
-    }
     async function getItem() {
-      let i = await fb.getItemByID(props.itemID);
+      let i = await fb.getItemByID(fb.viewingBlueprint.products.typeid);
       //console.log(i);
       setItem(i);
     }
-    if (!item) {
+    if (fb.viewingBlueprint) {
       getItem();
     }
     return () => {};
-  }, [props.itemID]);
+  }, [fb.viewingBlueprint]);
 
   return (
-    <Card variant="outlined" sx={{ maxWidth: "40em" }}>
+    <Card variant="outlined" sx={{ maxWidth: "40em", marginTop: "4em" }}>
       <CardHeader
         avatar={
-          <Avatar
-            src={`https://images.evetech.net/types/${props.itemID}/icon`}
-            sx={{ width: 100, height: 100 }}
-          />
+          fb.viewingBlueprint ? (
+            <Avatar
+              src={`https://images.evetech.net/types/${fb.viewingBlueprint.products.typeid}/icon`}
+              sx={{ width: 100, height: 100 }}
+            />
+          ) : (
+            <></>
+          )
         }
         title={
           item ? (
-            <><Typography variant="h3">{item.typeName}</Typography><Typography variant="h5">{'X' + props.multiplier}</Typography></>
+            <>
+              <Typography variant="h3">{item.typeName}</Typography>
+              <Typography variant="h5">
+                {Math.ceil(fb.viewingBlueprint.multiplier) + " runs"}
+              </Typography>
+            </>
           ) : (
             <Skeleton variant="text" width={200} height={50} />
           )
         }
       ></CardHeader>
       <CardContent sx={{ padding: { xs: "0.25em", md: "1em" } }}>
-        {blueprint ? (
-          <MaterialList blueprint={blueprint} multiplier={props.multiplier} />
+        {fb.viewingBlueprint ? (
+          <MaterialList
+            blueprint={fb.viewingBlueprint}
+            multiplier={fb.viewingBlueprint.multiplier}
+          />
         ) : (
           <Stack spacing={1}>
             <Skeleton variant="rounded" width={300} height={40} />

@@ -50,7 +50,7 @@ function ManufacturingTree(props) {
   const selectNode = (event, node) => {
     const nodeObject = searchTreeByID(fb.treeStructure, node);
     console.log("Found node object: ", nodeObject);
-    fb.setViewingBlueprintByID(nodeObject.typeid);
+    fb.setViewingBlueprintByID(nodeObject.typeid, nodeObject.quantity);
   };
 
   const container =
