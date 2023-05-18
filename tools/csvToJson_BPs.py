@@ -20,18 +20,35 @@ output = {"blueprints": []}
 def get_or_create_bp(id):
     for item in output['blueprints']:
         if item['blueprintID'] == id:
-            print(item)
             return item
-    new_item = {'blueprintID': id, 'materials': [], 'products': []}
+    new_item = {'blueprintID': id, 'materials': [], 'products': {}}
     output['blueprints'].append(new_item)
     return new_item
 
 for row in materials_list:
     bp = get_or_create_bp(row[0])
-    bp["materials"].append({row[1]: row[2]})
+    bp["materials"].append({'typeid': row[1], 'quantity': row[2]})
 for row in products_list:
     bp = get_or_create_bp(row[0])
-    bp["products"].append({row[1]: row[2]})
+    bp["products"] = {'typeid': row[1], 'quantity': row[2]}
 
-with open("tools/industryBlueprints.json", "w") as outfile:
-    json.dump(output, outfile, indent=4)
+def filterer(row):
+    if row['products'] == {} or row['materials'] == []:
+        print('Found One!')
+        print(row)
+        return False
+    return True
+print('Filtering invald blueprints...')
+filtered = list(filter(filterer, output['blueprints']))
+print('Final blueprints:')
+print(len(filtered))
+
+def split_list(item_list, elems):
+    for i in range(0, len(item_list), elems):
+        yield item_list[i:i + elems]
+
+split = list(split_list(filtered, 1000))
+print('Split into {} chunks.'.format(len(split)))
+for idx, chunk in enumerate(split):
+    with open('tools/industryBlueprints{}.json'.format(idx), "w") as outfile:
+        json.dump(chunk, outfile, indent=4)
