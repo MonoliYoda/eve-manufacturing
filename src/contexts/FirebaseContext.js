@@ -9,6 +9,7 @@ import {
   orderBy,
   Timestamp,
   where,
+  and,
 } from "firebase/firestore";
 const fetchRetry = require("fetch-retry")(global.fetch);
 
@@ -58,6 +59,48 @@ export function FirebaseProvider({ children }) {
     const document = await getDoc(q);
     //console.log(document.data());
     return document.data();
+  }
+
+  async function getItemsByNamePartial(partial) {
+    if (!partial) {
+      console.log(
+        "Invalid name passed to function getItemsByName(): ",
+        partial
+      );
+      return false;
+    }
+    const q = query(
+      collection(db, "typeids"),
+      and(
+        where("typeName", ">=", capitalizeWords(partial)),
+        where("typeName", "<=", capitalizeWords(partial) + "\uf8ff")
+      )
+    );
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+    });
+  }
+
+  async function getBlueprintsByNamePartial(partial) {
+    if (!partial) {
+      console.log(
+        "Invalid name passed to function getBlueprintsByNamePartial(): ",
+        partial
+      );
+      return false;
+    }
+    const q = query(
+      collection(db, "blueprints"),
+      and(
+        where("products.typeName", ">=", capitalizeWords(partial)),
+        where("products.typeName", "<=", capitalizeWords(partial) + "\uf8ff")
+      )
+    );
+    const querySnapshot = await getDocs(q);
+
+    const data = await querySnapshot.docs.map((doc) => doc.data());
+    return data;
   }
 
   async function setCurrentItemByID(id) {
@@ -138,7 +181,7 @@ export function FirebaseProvider({ children }) {
       //console.log("Material Tree: ");
       //console.dir(tree, { depth: null });
       setTreeStructure(tree);
-      setViewingBlueprint({ ...bp, quantity: 1, typeid: bp.products.typeid });
+      setViewingBlueprint({ ...bp, multiplier: 1, typeid: bp.products.typeid });
     }
   }
 
@@ -167,7 +210,7 @@ export function FirebaseProvider({ children }) {
             return true;
           }
         },
-        retryDelay: Math.floor(Math.random() * 3000) + 1000,
+        retryDelay: Math.floor(Math.random() * 2000) + 300,
       }).then(function (response) {
         return response.text();
       });
@@ -188,7 +231,7 @@ export function FirebaseProvider({ children }) {
         `${corsProxy}https://evetycoon.com/api/v1/market/stats/10000002/${id}`,
         3
       );
-      //console.log("Fetched data: ", data, " for ID ", id);
+      console.log("Fetched data: ", data, " for ID ", id);
       // Add to cache
       addToPriceCache(id, data);
       // Return
@@ -206,6 +249,18 @@ export function FirebaseProvider({ children }) {
     return currencySetup.format(number).slice(1) + " ISK";
   }
 
+  function capitalizeWords(string) {
+    const words = string.split(" ");
+
+    for (let i = 0; i < words.length; i++) {
+      try {
+        words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+      } catch {}
+    }
+
+    return words.join(" ");
+  }
+
   const value = {
     currentItem,
     setCurrentItemByID,
@@ -217,8 +272,11 @@ export function FirebaseProvider({ children }) {
     generateTreeForID,
     treeStructure,
     viewingBlueprint,
+    setViewingBlueprint,
     setViewingBlueprintByID,
     getPrice,
+    getItemsByNamePartial,
+    getBlueprintsByNamePartial,
   };
   return (
     <FirebaseContext.Provider value={value}>
