@@ -1,8 +1,8 @@
 import React from "react";
 import withContext from "../../contexts/withContext";
-import { AppBar, Box, Toolbar } from "@mui/material";
+import { AppBar, Box, IconButton, Toolbar } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
-import { SearchRounded } from "@mui/icons-material";
+import { Menu, SearchRounded } from "@mui/icons-material";
 import InputBase from "@mui/material/InputBase";
 
 const Search = styled("div")(({ theme }) => ({
@@ -47,23 +47,36 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function AppBarTop() {
+function AppBarTop(props) {
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Search>
-            <SearchIconWrapper>
-              <SearchRounded />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
-        </Toolbar>
-      </AppBar>
-    </Box>
+    <AppBar
+      position="fixed"
+      sx={{
+        width: { sm: `calc(100% - ${props.drawerWidth}px)` },
+        ml: { sm: `${props.drawerWidth}px` },
+      }}
+    >
+      <Toolbar>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          edge="start"
+          onClick={props.handleDrawerToggle}
+          sx={{ mr: 2, display: { sm: "none" } }}
+        >
+          <Menu />
+        </IconButton>
+        <Search>
+          <SearchIconWrapper>
+            <SearchRounded />
+          </SearchIconWrapper>
+          <StyledInputBase
+            placeholder="Search…"
+            inputProps={{ "aria-label": "search" }}
+          />
+        </Search>
+      </Toolbar>
+    </AppBar>
   );
 }
 

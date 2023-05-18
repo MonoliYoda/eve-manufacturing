@@ -1,15 +1,14 @@
 
 import "./App.css";
 import { FirebaseProvider } from "./contexts/FirebaseContext";
-import AppBarTop from "./components/appBar/AppBarTop";
-import { Container } from "@mui/material";
+
+import AppContainer from "./components/main/AppContainer";
 
 function App() {
   return (
     <FirebaseProvider>
-      <AppBarTop></AppBarTop>
-      <Container>
-      </Container>
+      
+      <AppContainer/>
     </FirebaseProvider>
   );
 }
