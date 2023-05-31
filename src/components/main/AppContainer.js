@@ -12,6 +12,7 @@ import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import BlueprintCard from "./blueprintCard/BlueprintCard";
 import AppBarTop from "../appBar/AppBarTop";
 import ManufacturingTree from "./ManufaturingTree/ManufacturingTree";
+import OptionsCard from "./Options/OptionsCard";
 
 const drawerWidth = 300;
 
@@ -46,13 +47,21 @@ function AppContainer(props) {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
+          marginTop: "4em",
         }}
       >
-        {fb.currentItem ? (
-          <BlueprintCard itemID={fb.currentItem.typeID} multiplier={1} />
-        ) : (
-          <div>No item</div>
-        )}
+        <Grid container spacing={2}>
+          <Grid xs={12}>
+            <OptionsCard />
+          </Grid>
+          <Grid xs={12}>
+            {fb.currentItem ? (
+              <BlueprintCard itemID={fb.currentItem.typeID} multiplier={1} />
+            ) : (
+              <div>No item</div>
+            )}
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

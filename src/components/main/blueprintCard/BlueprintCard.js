@@ -28,7 +28,7 @@ function BlueprintCard(props) {
   }, [fb.viewingBlueprint]);
 
   return (
-    <Card variant="outlined" sx={{ maxWidth: "40em", marginTop: "4em" }}>
+    <Card variant="outlined" sx={{ maxWidth: "40em" }}>
       <CardHeader
         avatar={
           fb.viewingBlueprint ? (
